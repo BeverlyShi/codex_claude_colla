@@ -1,0 +1,4 @@
+node_modules/
+
+# Debate session state and output (local only)
+.council/

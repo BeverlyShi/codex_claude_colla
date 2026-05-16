@@ -1,0 +1,21 @@
+{
+  "name": "claude-codex-debate",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Claude Code + Codex parallel/debate skill",
+  "scripts": {
+    "test:env": "node --version && codex --version && echo '✓ Environment OK'",
+    "test:sdk": "node -e \"import('@openai/codex-sdk').then(m => console.log('✓ SDK exports:', Object.keys(m)))\"",
+    "test:bridge": "node scripts/debate-bridge.mjs 'ping，用一句话回复'",
+    "test:bridge:stdin": "printf '%s' 'ping，用一句话回复' | node scripts/debate-bridge.mjs",
+    "test:mock": "node scripts/test-mock.mjs",
+    "test:all": "npm run test:env && npm run test:sdk && npm run test:bridge",
+    "debate": "node scripts/debate-orchestrator.mjs"
+  },
+  "dependencies": {
+    "@openai/codex-sdk": "^0.130.0"
+  },
+  "engines": {
+    "node": ">=18.18.0"
+  }
+}
