@@ -4,13 +4,14 @@
   "type": "module",
   "description": "Claude Code + Codex parallel/debate skill",
   "scripts": {
-    "test:env": "node --version && codex --version && echo '✓ Environment OK'",
-    "test:sdk": "node -e \"import('@openai/codex-sdk').then(m => console.log('✓ SDK exports:', Object.keys(m)))\"",
-    "test:bridge": "node scripts/debate-bridge.mjs 'ping，用一句话回复'",
+    "test:env":        "node --version && codex --version && echo '✓ CLI installed (not auth)'",
+    "test:codex-auth": "codex auth status 2>/dev/null || codex whoami 2>/dev/null || echo '⚠ auth status unavailable — run test:bridge to verify login'",
+    "test:sdk":        "node --input-type=module --eval \"import('@openai/codex-sdk').then(m => { const keys = Object.keys(m); console.log('✓ SDK exports:', keys); if (!keys.includes('Codex')) process.exit(1); })\"",
+    "test:bridge":     "node scripts/debate-bridge.mjs 'ping，用一句话回复'",
     "test:bridge:stdin": "printf '%s' 'ping，用一句话回复' | node scripts/debate-bridge.mjs",
-    "test:mock": "node scripts/test-mock.mjs",
-    "test:all": "npm run test:env && npm run test:sdk && npm run test:bridge",
-    "debate": "node scripts/debate-orchestrator.mjs"
+    "test:mock":       "node scripts/test-mock.mjs",
+    "test:all":        "npm run test:env && npm run test:sdk && npm run test:bridge",
+    "debate":          "node scripts/debate-orchestrator.mjs"
   },
   "dependencies": {
     "@openai/codex-sdk": "^0.130.0"

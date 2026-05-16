@@ -222,10 +222,23 @@ EOF
 | 方法名不同（如 `createThread`） | 更新 `debate-bridge.mjs` 对应行 |
 | `Codex` 不是默认导出 | 检查实际导出名 |
 
-### 1.3 Smoke Test（最小可运行验证）
+### 1.3 三级验证顺序与职责边界
+
+> 每级验证的范围不同，不能互相替代。
+
+| 脚本 | 验证内容 | 证明了什么 | 不能证明什么 |
+|------|---------|-----------|------------|
+| `test:env` | `node --version` + `codex --version` | CLI 已安装 | 是否已登录 |
+| `test:codex-auth` | `codex auth status` 或 `codex whoami` | 登录状态（如 CLI 支持） | SDK 接口是否匹配 |
+| `test:sdk` | import SDK + 检查 `Codex` 是否在 exports | SDK 可用且包含预期类 | 能否连接 Codex CLI |
+| `test:bridge` | 真实调用 `debate-bridge.mjs` | SDK 与 Codex CLI 通信正常，**登录状态有效** | — |
+
+**登录状态的唯一可靠验证是 `test:bridge`**。`test:codex-auth` 是补充项，若 CLI 不支持 `auth status` 子命令则静默跳过。
+
+### 1.4 Smoke Test（最小可运行验证）
 
 ```bash
-# 直接在 Node 中做最小调用，确认 SDK 能与 Codex CLI 通信
+# 直接在 Node 中做最小调用，确认 turn.finalResponse 真实存在
 node --input-type=module << 'EOF'
 import { Codex } from '@openai/codex-sdk';
 const c = new Codex();
@@ -236,12 +249,16 @@ console.log('finalResponse:', turn.finalResponse);
 EOF
 ```
 
-这一步的目的：在写任何封装之前，确认 `turn.finalResponse` 真实存在。
+目的：在 `debate-bridge.mjs` 任何封装之前，确认 `turn.finalResponse` 字段真实存在于当前 SDK 版本。
 
-### 1.4 验收测试
+### 1.5 验收测试
 
 ```bash
-npm run test:sdk && echo "✓ Phase 1 通过"
+# 按顺序执行，第一个失败即停止
+npm run test:env       # CLI 已安装
+npm run test:codex-auth # 登录状态（CLI 支持时）
+npm run test:sdk        # SDK 接口存在
+# test:bridge 留到 Phase 2 作为真实连通验证
 ```
 
 ---
@@ -537,14 +554,18 @@ echo "=== Mock 状态机 ==="
 npm run test:mock
 # 预期：所有 ✓，0 失败
 
-# ── 第二层：环境 + SDK ────────────────────────────────────
-echo "=== 环境 ==="
-node --version && echo "✓ Node"
-codex --version && echo "✓ Codex CLI"
-npm run test:sdk
+# ── 第二层：CLI 安装验证（不验证登录） ────────────────────────
+echo "=== 环境（CLI 安装） ==="
+npm run test:env        # 只证明 CLI 已安装
 
-# ── 第三层：Bridge 真实调用（需 Codex 已登录） ───────────────
-echo "=== Bridge ==="
+# ── 第三层：登录状态 + SDK 接口 ──────────────────────────────
+echo "=== 登录状态 ==="
+npm run test:codex-auth # codex auth status（CLI 支持时）；否则提示用 bridge 验证
+echo "=== SDK 接口 ==="
+npm run test:sdk        # 证明 Codex 类存在于 SDK exports
+
+# ── 第四层：Bridge 真实调用（唯一的完整登录验证） ────────────────
+echo "=== Bridge（真实登录验证）==="
 npm run test:bridge
 npm run test:bridge:stdin
 
