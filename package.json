@@ -11,7 +11,8 @@
     "test:bridge:stdin": "printf '%s' 'ping，用一句话回复' | node scripts/debate-bridge.mjs",
     "test:mock":       "node scripts/test-mock.mjs",
     "test:all":        "npm run test:env && npm run test:sdk && npm run test:bridge",
-    "debate":          "node scripts/debate-orchestrator.mjs"
+    "debate":          "node scripts/debate-orchestrator.mjs",
+    "setup":           "node scripts/setup.mjs"
   },
   "dependencies": {
     "@openai/codex-sdk": "^0.130.0"
