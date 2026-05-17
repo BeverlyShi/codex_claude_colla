@@ -16,7 +16,7 @@
 //   CODEX_MOCK=1 node scripts/debate-orchestrator.mjs ...
 
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
-import { spawnSync } from 'child_process';
+import { spawnSync, spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -233,6 +233,9 @@ async function run() {
 
       writeFileSync(session.outputFile, header + session.transcript);
       process.stdout.write(`SAVED ${session.outputFile}\n`);
+
+      // Open in system default Markdown viewer (fire-and-forget, non-blocking)
+      spawn('open', [session.outputFile], { detached: true, stdio: 'ignore' }).unref();
       break;
     }
 
