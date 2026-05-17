@@ -28,8 +28,9 @@ description: >
 
 **Step 3 — 获取 Codex 回复**
 执行以下命令（使用 stdin 传递 prompt，避免引号和换行破坏命令）：
+> **注意：** 执行时必须将 `PROMPT` 替换为 Step 1 提取的用户真实输入内容，不要字面传入字符串 `"PROMPT"`。
 ```bash
-printf '%s' "PROMPT" | node scripts/debate-bridge.mjs 2>&1
+printf '%s' "<用户真实输入>" | node scripts/debate-bridge.mjs 2>&1
 ```
 - 记录 exit code 和输出内容
 - 若 exit code 为 0：将输出记为 CODEX_RESPONSE
@@ -84,8 +85,9 @@ printf '%s' "PROMPT" | node scripts/debate-bridge.mjs 2>&1
 ### 执行步骤
 
 **Step 1 — 初始化 session**
+> **注意：** 以下所有命令中，`PROMPT`、`CLAUDE_RESPONSE`、`SYNTHESIS`、`SESSION_ID`、`N` 均为变量占位符，执行时必须替换为对应的真实内容，不要字面传入这些字符串。
 ```bash
-node scripts/debate-orchestrator.mjs start --prompt "PROMPT" --rounds N
+node scripts/debate-orchestrator.mjs start --prompt "<用户真实输入>" --rounds <轮数>
 ```
 从输出解析 `sessionId=<id>`，记为 SESSION_ID。
 告知用户：`⚖ 开始 N 轮辩论，sessionId: SESSION_ID`
@@ -98,7 +100,7 @@ node scripts/debate-orchestrator.mjs start --prompt "PROMPT" --rounds N
 
 2b. 将 Claude 回复传给 orchestrator：
 ```bash
-printf '%s' "CLAUDE_RESPONSE" | node scripts/debate-orchestrator.mjs turn --session SESSION_ID 2>&1
+printf '%s' "<Claude 本轮回复内容>" | node scripts/debate-orchestrator.mjs turn --session <sessionId> 2>&1
 ```
 - 若 exit code 非 0：显示错误，本轮 Codex 标注 `[Codex 无响应]`，继续下一轮
 - 若成功：将输出作为 Codex 本轮批评展示给用户
@@ -106,7 +108,7 @@ printf '%s' "CLAUDE_RESPONSE" | node scripts/debate-orchestrator.mjs turn --sess
 **Step 3 — 最终综合**
 基于完整辩论内容生成综合裁定（执行摘要 + 各方核心论点 + 建议行动），然后：
 ```bash
-printf '%s' "SYNTHESIS" | node scripts/debate-orchestrator.mjs finish --session SESSION_ID 2>&1
+printf '%s' "<综合裁定内容>" | node scripts/debate-orchestrator.mjs finish --session <sessionId> 2>&1
 ```
 告知用户辩论记录文件路径。
 
