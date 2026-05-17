@@ -667,6 +667,12 @@ ls .council/*.md 2>/dev/null        && echo "✓ Council"  || echo "○ 尚无�
 **Why：** 固定单一 `.session.json` 在两场并发辩论或中途中断重试时会覆盖状态。时间戳命名保证唯一性，同时也是可读的调试索引。  
 **How to apply：** Skill 在 `start` 输出中解析 `sessionId=...`，后续所有 `turn`/`finish` 调用附带该 id。
 
+### ADR-009：对抗性引导注入在 orchestrator 而非 SKILL.md
+
+**决策：** `ADVERSARIAL_FRAME` 字符串在 `debate-orchestrator.mjs` 的 `buildCodexInput()` 中拼接到每次 Codex 调用的 prompt 最前面。SKILL.md 只做角色说明，不重复注入引导语。  
+**Why：** SKILL.md 是给 Claude 读的指令，不影响 Codex 收到的内容。Codex 在没有明确角色指令时默认倾向共识和补充，而非对抗。对抗性引导必须在 orchestrator 层注入才能真正影响 Codex 的输出风格。验收中发现 Codex 以"同意"开头做增量补充，产品价值严重折损——debate 退化为 parallel 的延伸版。  
+**How to apply：** `buildCodexInput` 始终以 `ADVERSARIAL_FRAME` 开头，无论是完整 transcript 路径还是压缩摘要路径。引导语要求 Codex 先找问题、指出失败场景和被忽略的代价，不以"同意"或"补充"开头。
+
 ### ADR-008：mock 模式置于 orchestrator 而非 bridge
 
 **决策：** `CODEX_MOCK=1` 在 `orchestrator.mjs` 的 `callCodex()` 中短路，不经过 `spawnSync`。  

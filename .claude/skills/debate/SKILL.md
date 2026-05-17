@@ -7,6 +7,11 @@ description: >
 
 # Debate Skill
 
+### 角色说明
+- **Claude**：提案方，负责给出方案并在每轮中回应批评
+- **Codex**：对手审查者（adversarial reviewer），被指令优先寻找漏洞和反例，而非补充正确部分
+- **Codex 的对抗性引导已在 debate-orchestrator.mjs 中注入**，Claude 无需在 prompt 里重复，但在解读 Codex 回复和生成最终裁定时应以此角色设定为参照
+
 ### 触发条件
 用户输入以 `/debate` 开头。
 

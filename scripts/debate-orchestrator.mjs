@@ -67,10 +67,25 @@ function readStdin() {
   });
 }
 
+// Adversarial framing prepended to every Codex call in debate mode.
+// Without this, LLMs default to consensus-seeking and additive feedback.
+// The goal is genuine friction: find failure modes, not refine correct parts.
+const ADVERSARIAL_FRAME = `\
+你的角色是对手审查者（adversarial reviewer）。
+你的任务是寻找对方论点的漏洞、边界条件和反例，而不是补充对方已经正确的部分。
+具体要求：
+- 如果对方方案在某些场景下会失败，明确指出是哪些场景
+- 如果对方忽略了重要的权衡取舍，明确指出被忽略的代价
+- 如果你认为对方方案存在更优替代，提出并说明为何更优
+- 不要以"同意"或"补充"开头——先找问题，再评价优点
+
+---
+`;
+
 // ADR-003: full transcript under threshold; structured summary prepended above it
 function buildCodexInput(prompt, transcript) {
   if (transcript.length <= TRANSCRIPT_COMPRESS_CHARS) {
-    return `${prompt}\n\n${transcript}`;
+    return `${ADVERSARIAL_FRAME}${prompt}\n\n${transcript}`;
   }
   const summary = transcript
     .split(/(?=^## )/m)
@@ -81,7 +96,7 @@ function buildCodexInput(prompt, transcript) {
       return `${heading}\n${body}${body.length === 300 ? '…' : ''}`;
     })
     .join('\n\n');
-  return `${prompt}\n\n[以下为辩论摘要，完整记录已超过压缩阈值]\n\n${summary}`;
+  return `${ADVERSARIAL_FRAME}${prompt}\n\n[以下为辩论摘要，完整记录已超过压缩阈值]\n\n${summary}`;
 }
 
 // Returns Codex response string; records reason on failure for transcript annotation.
