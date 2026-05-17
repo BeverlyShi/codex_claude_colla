@@ -200,14 +200,7 @@ async function run() {
       session.transcript += `## Round ${session.currentRound} — Codex\n\n${codexResponse}\n\n`;
       saveSession(session);
 
-      // Print a terminal-friendly preview; full response is in the session file.
-      // Long outputs collapse in Claude Code UI — keep stdout short for readability.
-      const PREVIEW_CHARS = 400;
-      const isLong = codexResponse.length > PREVIEW_CHARS;
-      const preview = isLong
-        ? codexResponse.slice(0, PREVIEW_CHARS) + `\n…（已截断，完整回复见 ${session.outputFile}）`
-        : codexResponse;
-      process.stdout.write(preview);
+      process.stdout.write(codexResponse);
       break;
     }
 
