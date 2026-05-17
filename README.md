@@ -72,6 +72,27 @@ your-project/
 
 `.council/` 已加入 `.gitignore`，不会提交到版本库。
 
+## 完整工作流（推荐）
+
+安装 OpenAI 官方插件 [codex-plugin-cc](https://github.com/openai/codex-plugin-cc)，解锁 Codex 代码执行能力：
+
+```
+# 在 Claude Code 中执行一次
+/plugin marketplace add openai/codex-plugin-cc
+```
+
+安装后，典型工作流：
+
+```
+/debate 我们应该用 Redis 还是内存缓存？ --rounds 2
+  → Claude 与 Codex 多轮辩论，得出最优方案
+
+/codex:rescue 根据辩论结论，用 Redis 实现缓存层，修改 src/cache.ts
+  → Codex 作为 agent 直接写代码、修改文件
+```
+
+也可以随时独立使用 `/codex:rescue` 将任何任务委托给 Codex 执行。
+
 ## 更新
 
 ```bash

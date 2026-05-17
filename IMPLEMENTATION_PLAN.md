@@ -679,11 +679,11 @@ ls .council/*.md 2>/dev/null        && echo "✓ Council"  || echo "○ 尚无�
 **Why：** Phase 4 的测试目标是状态机（session 文件、轮次、transcript 累积），不是桥接层。在 orchestrator 层 mock 避免了子进程开销，让 `npm run test:mock` 可以在离线环境下毫秒级完成。  
 **How to apply：** `CODEX_MOCK=1` 时 `callCodex` 返回固定字符串；`test-mock.mjs` 通过 `env` 注入该变量。
 
-### ADR-006：codex-plugin-cc 降级为可选增强
+### ADR-006：codex-plugin-cc 为 OpenAI 官方插件，安装后作为能力扩展层
 
-**决策：** MVP 不依赖 `codex-plugin-cc`；`/codex:review`、`/codex:status` 等命令归入可选插件功能。  
-**Why：** npm 上的 `codex-plugin-cc` 发布者为社区用户（Kenmege），非 OpenAI 官方；将其作为前置依赖会让 MVP 被一个不确定的外部包阻塞。  
-**How to apply：** Phase 0.3 标记为可选，完整通过核查后再决定是否安装。
+**决策：** `codex-plugin-cc` 归属 `github.com/openai/codex-plugin-cc`，是 OpenAI 官方插件。MVP 阶段为降低风险仍不依赖它，但验证通过后应将其纳入推荐工作流。  
+**Why：** 早期评审时误判为社区包（Kenmege），实际上是 OpenAI 官方组织发布。`/codex:rescue` 提供 Codex agent 代码执行能力，`/codex:adversarial-review` 与 debate 的对抗性审查目标互补，是本项目的自然扩展层。  
+**How to apply：** 安装方式：在 Claude Code 中执行 `/plugin marketplace add openai/codex-plugin-cc`。安装后完整工作流为：`/debate` 辩论决策 → `/codex:rescue` 委托 Codex 执行实现。
 
 ---
 
