@@ -2,3 +2,9 @@ node_modules/
 
 # Debate session state and output (local only)
 .council/
+
+# macOS metadata
+.DS_Store
+
+# Claude Code local settings (contains absolute local paths)
+.claude/settings.local.json
