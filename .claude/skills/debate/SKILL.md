@@ -37,6 +37,7 @@ node scripts/debate-orchestrator.mjs start --prompt "<用户真实输入>" --rou
 2a. 生成 Claude 本轮回复：
   - 第 1 轮：基于 PROMPT
   - 后续轮：基于上一轮 Codex 的批评内容
+  - **长度约束：每轮控制在 200 字以内，聚焦核心论点或反驳，留详细展开给最终综合**
 
 2b. 将 Claude 回复传给 orchestrator：
 ```bash
