@@ -21,8 +21,8 @@ codex login   # 使用 ChatGPT 账号，复用现有订阅，无需额外 API �
 ## 安装（一次性）
 
 ```bash
-git clone https://github.com/your-username/claude-codex-debate
-cd claude-codex-debate
+git clone https://github.com/BeverlyShi/codex_claude_colla
+cd codex_claude_colla
 npm install
 npm run setup
 ```
@@ -96,7 +96,7 @@ your-project/
 ## 更新
 
 ```bash
-cd claude-codex-debate
+cd codex_claude_colla
 git pull
 npm run setup   # 重新安装，覆盖旧版本
 ```
